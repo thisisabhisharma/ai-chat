@@ -37,57 +37,61 @@ export default function Home() {
 
   return (
     <main className="max-w-2xl mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">AI Chat bot</h1>
+      <div>
+        <h1 className="text-2xl font-bold mb-4">AI Chat bot</h1>
 
-      <div className="space-y-2">
-        {messages.map((msg, i) => (
-          <div
-            key={i}
-            className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-          >
+        <div className="space-y-2">
+          {messages.map((msg, i) => (
             <div
-              className={`p-3 rounded w-fit ${msg.role === "user"
-                ? "bg-[#747474] text-white"
-                : "bg-[#202020] text-white"
-                }`}
+              key={i}
+              className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
             >
-              {msg.content}
+              <div
+                className={`p-3 rounded w-fit ${msg.role === "user"
+                  ? "bg-[#747474] text-white"
+                  : "bg-[#202020] text-white"
+                  }`}
+              >
+                {msg.content}
+              </div>
             </div>
-          </div>
-        ))}
-        {loading && (
-          <div className="flex justify-start">
-            <div className="p-3 rounded bg-gray-200 text-gray-500 italic w-fit">
-              AI is typing...⏳⏳⏳
+          ))}
+          {loading && (
+            <div className="flex justify-start">
+              <div className="p-3 rounded bg-gray-200 text-gray-500 italic w-fit">
+                AI is typing...⏳⏳⏳
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
-      <div className="flex mt-4 gap-2">
-        <input
-          className="flex-1 border rounded px-4 py-2"
-          value={input}
-          placeholder="Ask something..."
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              e.preventDefault()
-              sendMessage()
-            }
-          }}
-          disabled={loading}
-        />
-        <button
-          className={`${input === "" ? 'bg-gray-400 text-white px-4 py-2 rounded disabled:opacity-50' : 'bg-white text-black px-4 py-2 rounded disabled:opacity-50'}`}
-          onClick={sendMessage}
-          disabled={loading}
-        >
-          {loading ? "Sending..." : "Send"}
-        </button>
-      </div>
+      <div className="fixed bottom-0 w-full max-w-2xl mx-auto p-4 shadow-md">
+        <div className="flex mt-4 gap-2">
+          <input
+            className="flex-1 border rounded px-4 py-2"
+            value={input}
+            placeholder="Ask something..."
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault()
+                sendMessage()
+              }
+            }}
+            disabled={loading}
+          />
+          <button
+            className={`${input === "" ? 'bg-gray-400 text-white px-4 py-2 rounded disabled:opacity-50' : 'bg-white text-black px-4 py-2 rounded disabled:opacity-50'}`}
+            onClick={sendMessage}
+            disabled={loading}
+          >
+            {loading ? "Sending..." : "Send"}
+          </button>
+        </div>
 
-      <p className="text-sm text-gray-500 mt-2">Messages left: {MAX - count}</p>
+        <p className="text-sm text-gray-500 mt-2">Messages left: {MAX - count}</p>
+      </div>
     </main>
   )
 }
