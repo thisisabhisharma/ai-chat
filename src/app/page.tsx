@@ -48,6 +48,12 @@ export default function Home() {
           value={input}
           placeholder="Ask something..."
           onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault()
+              sendMessage()
+            }
+          }}
         />
         <button className="bg-blue-600 text-white px-4 py-2 rounded" onClick={sendMessage}>
           Send
