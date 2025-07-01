@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import ReactMarkdown from "react-markdown"
 
 export default function Home() {
   const [input, setInput] = useState("")
@@ -40,19 +41,25 @@ export default function Home() {
       <div>
         <h1 className="text-2xl font-bold mb-4">AI Chat bot</h1>
 
-        <div className="space-y-2">
+        <div id="msgDiv" className="space-y-2 pb-32">
           {messages.map((msg, i) => (
             <div
               key={i}
               className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
             >
               <div
-                className={`p-3 rounded w-fit ${msg.role === "user"
-                  ? "bg-[#747474] text-white"
-                  : "bg-[#202020] text-white"
-                  }`}
+                className={`p-3 rounded w-fit max-w-[80%] ${
+                  msg.role === "user"
+                    ? "bg-[#747474] text-white"
+                    : "bg-[#202020] text-white"
+                }`}
+                style={{ wordBreak: "break-word" }}
               >
-                {msg.content}
+                {msg.role === "assistant" ? (
+                  <ReactMarkdown>{msg.content}</ReactMarkdown>
+                ) : (
+                  msg.content
+                )}
               </div>
             </div>
           ))}
@@ -66,7 +73,7 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="fixed bottom-0 w-full max-w-2xl mx-auto p-4 shadow-md">
+      <div id="bottomDiv" style={{ width: '90%' }} className="fixed bg-[#252525] bottom-0 max-w-2xl mx-auto p-4">
         <div className="flex mt-4 gap-2">
           <input
             className="flex-1 border rounded px-4 py-2"
