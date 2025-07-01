@@ -6,28 +6,33 @@ export default function Home() {
   const [input, setInput] = useState("")
   const [messages, setMessages] = useState<{ role: string; content: string }[]>([])
   const [count, setCount] = useState(0)
+  const [loading, setLoading] = useState(false)
   const MAX = 10
 
   const sendMessage = async () => {
-    if (!input.trim() || count >= MAX) return
+    if (!input.trim() || count >= MAX || loading) return
 
     setMessages([...messages, { role: "user", content: input }])
     setInput("")
     setCount(prev => prev + 1)
+    setLoading(true)
 
-    const res = await fetch("/api/openrouter", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: input }),
-    })
-    if (!res.ok) {
-      const errorText = await res.text()
-      setMessages(prev => [...prev, { role: "assistant", content: `❌ Error: ${errorText}` }])
-      return
+    try {
+      const res = await fetch("/api/openrouter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: input }),
+      })
+      if (!res.ok) {
+        const errorText = await res.text()
+        setMessages(prev => [...prev, { role: "assistant", content: `❌ Error: ${errorText}` }])
+      } else {
+        const data = await res.json()
+        setMessages(prev => [...prev, { role: "assistant", content: data.reply }])
+      }
+    } finally {
+      setLoading(false)
     }
-
-    const data = await res.json()
-    setMessages(prev => [...prev, { role: "assistant", content: data.reply }])
   }
 
   return (
@@ -36,10 +41,27 @@ export default function Home() {
 
       <div className="space-y-2">
         {messages.map((msg, i) => (
-          <div key={i} className={`p-3 rounded ${msg.role === "user" ? "bg-white text-right text-black" : "bg-purple-500"}`}>
-            {msg.content}
+          <div
+            key={i}
+            className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+          >
+            <div
+              className={`p-3 rounded w-fit ${msg.role === "user"
+                ? "bg-[#747474] text-white"
+                : "bg-[#202020] text-white"
+                }`}
+            >
+              {msg.content}
+            </div>
           </div>
         ))}
+        {loading && (
+          <div className="flex justify-start">
+            <div className="p-3 rounded bg-gray-200 text-gray-500 italic w-fit">
+              AI is typing...⏳⏳⏳
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="flex mt-4 gap-2">
@@ -48,9 +70,20 @@ export default function Home() {
           value={input}
           placeholder="Ask something..."
           onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault()
+              sendMessage()
+            }
+          }}
+          disabled={loading}
         />
-        <button className="bg-blue-600 text-white px-4 py-2 rounded" onClick={sendMessage}>
-          Send
+        <button
+          className={`${input === "" ? 'bg-gray-400 text-white px-4 py-2 rounded disabled:opacity-50' : 'bg-white text-black px-4 py-2 rounded disabled:opacity-50'}`}
+          onClick={sendMessage}
+          disabled={loading}
+        >
+          {loading ? "Sending..." : "Send"}
         </button>
       </div>
 
