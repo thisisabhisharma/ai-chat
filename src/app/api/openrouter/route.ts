@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { translate } from "@vitalets/google-translate-api"
 
 export async function POST(req: NextRequest) {
     const { message } = await req.json()
@@ -31,5 +32,15 @@ export async function POST(req: NextRequest) {
     const data = await res.json()
     const reply = data.choices?.[0]?.message?.content || "🤖 No response."
 
-    return NextResponse.json({ reply })
+    // Translate reply to English
+    let translatedReply = reply
+    try {
+        const translation = await translate(reply, { to: "en" })
+        translatedReply = translation.text
+    } catch (e) {
+        console.error("Translation error:", e)
+        // fallback to original reply
+    }
+
+    return NextResponse.json({ reply: translatedReply })
 }
